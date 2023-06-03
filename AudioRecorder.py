@@ -1,5 +1,8 @@
 import custom_speech_recognition as sr
-import pyaudiowpatch as pyaudio
+# TODO: add crossplatform support for the pyaudio import
+#import pyaudiowpatch as pyaudio
+import pyaudio
+import platform
 from datetime import datetime
 
 RECORD_TIMEOUT = 3
@@ -20,6 +23,7 @@ class BaseRecorder:
 
     def adjust_for_noise(self, device_name, msg):
         print(f"[INFO] Adjusting for ambient noise from {device_name}. " + msg)
+        print("SOURCE INFO: {}", self.source.list_working_microphones())
         with self.source:
             self.recorder.adjust_for_ambient_noise(self.source)
         print(f"[INFO] Completed ambient noise adjustment for {device_name}.")
@@ -38,10 +42,19 @@ class DefaultMicRecorder(BaseRecorder):
 
 class DefaultSpeakerRecorder(BaseRecorder):
     def __init__(self):
-        with pyaudio.PyAudio() as p:
-            wasapi_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
-            default_speakers = p.get_device_info_by_index(wasapi_info["defaultOutputDevice"])
-            
+
+        os_name = platform.system()
+        host_api_type = None
+
+        if os_name == 'Windows':
+            host_api_type = pyaudio.paWASAPI
+        elif os_name == 'Darwin':
+            host_api_type = pyaudio.paCoreAudio
+
+        p = pyaudio.PyAudio()
+        api_info = p.get_host_api_info_by_type(host_api_type)
+        default_speakers = p.get_device_info_by_index(api_info["defaultOutputDevice"])
+        if os_name == 'Windows':
             if not default_speakers["isLoopbackDevice"]:
                 for loopback in p.get_loopback_device_info_generator():
                     if default_speakers["name"] in loopback["name"]:
@@ -49,11 +62,14 @@ class DefaultSpeakerRecorder(BaseRecorder):
                         break
                 else:
                     print("[ERROR] No loopback device found.")
-        
+        p.terminate()
+
         source = sr.Microphone(speaker=True,
                                device_index= default_speakers["index"],
                                sample_rate=int(default_speakers["defaultSampleRate"]),
                                chunk_size=pyaudio.get_sample_size(pyaudio.paInt16),
                                channels=default_speakers["maxInputChannels"])
         super().__init__(source=source, source_name="Speaker")
-        self.adjust_for_noise("Default Speaker", "Please make or play some noise from the Default Speaker...")
+        #TODO: make speaker name cross-platform compatible
+        # self.adjust_for_noise("Default Speaker", "Please make or play some noise from the Default Speaker...")
+        self.adjust_for_noise("MacBook Pro Speakers", "Please make or play some noise from the MacBook Pro Speakers...")

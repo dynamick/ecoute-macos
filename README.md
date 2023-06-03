@@ -15,10 +15,13 @@ Follow these steps to set up and run Ecoute on your local machine.
 
 ### 📋 Prerequisites
 
+#### Common
+
 - Python >=3.8.0
 - An OpenAI API key
-- Windows OS (Not tested on others)
-- FFmpeg 
+- FFmpeg
+
+#### Windows
 
 If FFmpeg is not installed in your system, you can follow the steps below to install it.
 
@@ -31,6 +34,13 @@ Once Chocolatey is installed, you can install FFmpeg by running the following co
 choco install ffmpeg-full
 ```
 Please ensure that you run these commands in a PowerShell window with administrator privileges. If you face any issues during the installation, you can visit the official Chocolatey and FFmpeg websites for troubleshooting.
+
+
+#### macOS
+
+- XCode Command Line Tools
+- Dependencies and tools: `brew install portaudio python-tk ffmpeg`
+
 
 ### 🔧 Installation
 
@@ -51,7 +61,7 @@ Please ensure that you run these commands in a PowerShell window with administra
    ```
    pip install -r requirements.txt
    ```
-   
+
 4. Create a `keys.py` file in the ecoute directory and add your OpenAI API key:
 
    - Option 1: You can utilize a command on your command prompt. Run the following command, ensuring to replace "API KEY" with your actual OpenAI API key:
@@ -61,7 +71,7 @@ Please ensure that you run these commands in a PowerShell window with administra
       ```
 
    - Option 2: You can create the keys.py file manually. Open up your text editor of choice and enter the following content:
-   
+
       ```
       OPENAI_API_KEY="API KEY"
       ```
