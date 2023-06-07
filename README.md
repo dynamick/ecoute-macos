@@ -22,8 +22,8 @@ Follow these steps to set up and run Ecoute on your local machine.
 #### Common
 
 - Python >=3.8.0
-- An OpenAI API key
-- FFmpeg
+- An OpenAI API key that can access OpenAI API (set up a paid account OpenAI account)
+- FFmpeg (check below for installation instructions)
 
 #### Windows
 
@@ -38,7 +38,6 @@ Once Chocolatey is installed, you can install FFmpeg by running the following co
 choco install ffmpeg
 ```
 Please ensure that you run these commands in a PowerShell window with administrator privileges. If you face any issues during the installation, you can visit the official Chocolatey and FFmpeg websites for troubleshooting.
-
 
 #### macOS
 
