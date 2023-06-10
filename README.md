@@ -38,9 +38,20 @@ Please ensure that you run these commands in a PowerShell window with administra
 
 #### macOS
 
-- XCode Command Line Tools
-- Dependencies and tools: `brew install portaudio python-tk ffmpeg`
+**Dependencies and tools**
 
+- XCode Command Line Tools
+- `brew install portaudio python-tk ffmpeg blackhole-2ch`
+
+**BlackHole configuration**
+
+Setup "Multi-Ouput Device" and set it as default sound output device for your macOS. Guidelines are available [here](https://github.com/ExistentialAudio/BlackHole/wiki/Multi-Output-Device)
+
+**Configuring device names**
+
+Speakers audio on macOS will be recorded from the virtual "BlackHole 2ch" microphone. Your and BlackHole microphone device names could be adjusted via `HUMAN_MIC_NAME` and `BLACKHOLE_MIC_NAME` vars in the [AudioRecorder.py](./AudioRecorder.py).
+
+Run `python fetch_sr_data.py` to get speaker and microphone devices list and their indices.
 
 ### 🔧 Installation
 

@@ -4,7 +4,8 @@ import wave
 import os
 import threading
 from tempfile import NamedTemporaryFile
-import custom_speech_recognition as sr
+# import custom_speech_recognition as sr
+import speech_recognition as sr
 import io
 from datetime import timedelta
 # TODO: add crossplatform support for the pyaudio import
@@ -25,7 +26,7 @@ class AudioTranscriber:
             "You": {
                 "sample_rate": mic_source.SAMPLE_RATE,
                 "sample_width": mic_source.SAMPLE_WIDTH,
-                "channels": mic_source.channels,
+                # "channels": mic_source.channels,
                 "last_sample": bytes(),
                 "last_spoken": None,
                 "new_phrase": True,
@@ -34,7 +35,7 @@ class AudioTranscriber:
             "Speaker": {
                 "sample_rate": speaker_source.SAMPLE_RATE,
                 "sample_width": speaker_source.SAMPLE_WIDTH,
-                "channels": speaker_source.channels,
+                # "channels": speaker_source.channels,
                 "last_sample": bytes(),
                 "last_spoken": None,
                 "new_phrase": True,
@@ -84,7 +85,7 @@ class AudioTranscriber:
 
     def process_speaker_data(self, data, temp_file_name):
         with wave.open(temp_file_name, 'wb') as wf:
-            wf.setnchannels(self.audio_sources["Speaker"]["channels"])
+            # wf.setnchannels(self.audio_sources["Speaker"]["channels"])
             p = pyaudio.PyAudio()
             wf.setsampwidth(p.get_sample_size(pyaudio.paInt16))
             wf.setframerate(self.audio_sources["Speaker"]["sample_rate"])

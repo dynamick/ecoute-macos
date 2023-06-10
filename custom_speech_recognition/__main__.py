@@ -1,4 +1,5 @@
-import custom_speech_recognition as sr
+# import custom_speech_recognition as sr
+import speech_recognition as sr
 
 r = sr.Recognizer()
 m = sr.Microphone()
