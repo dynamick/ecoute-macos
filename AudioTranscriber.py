@@ -4,10 +4,13 @@ import wave
 import os
 import threading
 from tempfile import NamedTemporaryFile
-import custom_speech_recognition as sr
+# import custom_speech_recognition as sr
+import speech_recognition as sr
 import io
 from datetime import timedelta
-import pyaudiowpatch as pyaudio
+# TODO: add crossplatform support for the pyaudio import
+#import pyaudiowpatch as pyaudio
+import pyaudio
 from heapq import merge
 
 PHRASE_TIMEOUT = 3.05
@@ -23,7 +26,7 @@ class AudioTranscriber:
             "You": {
                 "sample_rate": mic_source.SAMPLE_RATE,
                 "sample_width": mic_source.SAMPLE_WIDTH,
-                "channels": mic_source.channels,
+                # "channels": mic_source.channels,
                 "last_sample": bytes(),
                 "last_spoken": None,
                 "new_phrase": True,
@@ -32,7 +35,7 @@ class AudioTranscriber:
             "Speaker": {
                 "sample_rate": speaker_source.SAMPLE_RATE,
                 "sample_width": speaker_source.SAMPLE_WIDTH,
-                "channels": speaker_source.channels,
+                # "channels": speaker_source.channels,
                 "last_sample": bytes(),
                 "last_spoken": None,
                 "new_phrase": True,
@@ -72,7 +75,7 @@ class AudioTranscriber:
             source_info["new_phrase"] = False
 
         source_info["last_sample"] += data
-        source_info["last_spoken"] = time_spoken 
+        source_info["last_spoken"] = time_spoken
 
     def process_mic_data(self, data, temp_file_name):
         audio_data = sr.AudioData(data, self.audio_sources["You"]["sample_rate"], self.audio_sources["You"]["sample_width"])
@@ -82,7 +85,7 @@ class AudioTranscriber:
 
     def process_speaker_data(self, data, temp_file_name):
         with wave.open(temp_file_name, 'wb') as wf:
-            wf.setnchannels(self.audio_sources["Speaker"]["channels"])
+            # wf.setnchannels(self.audio_sources["Speaker"]["channels"])
             p = pyaudio.PyAudio()
             wf.setsampwidth(p.get_sample_size(pyaudio.paInt16))
             wf.setframerate(self.audio_sources["Speaker"]["sample_rate"])
@@ -101,11 +104,11 @@ class AudioTranscriber:
 
     def get_transcript(self):
         combined_transcript = list(merge(
-            self.transcript_data["You"], self.transcript_data["Speaker"], 
+            self.transcript_data["You"], self.transcript_data["Speaker"],
             key=lambda x: x[1], reverse=True))
         combined_transcript = combined_transcript[:MAX_PHRASES]
         return "".join([t[0] for t in combined_transcript])
-    
+
     def clear_transcript_data(self):
         self.transcript_data["You"].clear()
         self.transcript_data["Speaker"].clear()

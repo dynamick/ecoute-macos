@@ -1,10 +1,17 @@
-import custom_speech_recognition as sr
-import pyaudiowpatch as pyaudio
+# import custom_speech_recognition as sr
+import speech_recognition as sr
+# TODO: add crossplatform support for the pyaudio import
+#import pyaudiowpatch as pyaudio
+import pyaudio
+import platform
 from datetime import datetime
 
 RECORD_TIMEOUT = 3
 ENERGY_THRESHOLD = 1000
 DYNAMIC_ENERGY_THRESHOLD = False
+HUMAN_MIC_NAME = "Plantronics Blackwire 3220 Series"
+# macOS specific, see README.md#macos for the details on how to configure the BlackHole device
+BLACKHOLE_MIC_NAME = "BlackHole 2ch"
 
 class BaseRecorder:
     def __init__(self, source, source_name):
@@ -18,11 +25,11 @@ class BaseRecorder:
         self.source = source
         self.source_name = source_name
 
-    def adjust_for_noise(self, device_name, msg):
-        print(f"[INFO] Adjusting for ambient noise from {device_name}. " + msg)
+    def adjust_for_noise(self, msg):
+        print(f"[INFO] Adjusting for ambient noise. " + msg)
         with self.source:
             self.recorder.adjust_for_ambient_noise(self.source)
-        print(f"[INFO] Completed ambient noise adjustment for {device_name}.")
+        print(f"[INFO] Completed ambient noise adjustment")
 
     def record_into_queue(self, audio_queue):
         def record_callback(_, audio:sr.AudioData) -> None:
@@ -33,15 +40,23 @@ class BaseRecorder:
 
 class DefaultMicRecorder(BaseRecorder):
     def __init__(self):
-        super().__init__(source=sr.Microphone(sample_rate=16000), source_name="You")
-        self.adjust_for_noise("Default Mic", "Please make some noise from the Default Mic...")
+        working_mics = sr.Microphone.list_working_microphones()
+        print("[DEBUG] Available microphones: {}".format(working_mics))
+        device_index = list(working_mics.keys())[list(working_mics.values()).index(HUMAN_MIC_NAME)]
+        super().__init__(source=sr.Microphone(device_index=device_index, sample_rate=16000), source_name="You")
+        self.adjust_for_noise("Please make some noise from the " + HUMAN_MIC_NAME + " ...")
 
 class DefaultSpeakerRecorder(BaseRecorder):
     def __init__(self):
-        with pyaudio.PyAudio() as p:
-            wasapi_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
-            default_speakers = p.get_device_info_by_index(wasapi_info["defaultOutputDevice"])
-            
+
+        os_name = platform.system()
+        dev_index = None
+
+        if os_name == 'Windows':
+            p = pyaudio.PyAudio()
+            api_info = p.get_host_api_info_by_type(pyaudio.paWASAPI)
+            default_speakers = p.get_device_info_by_index(api_info["defaultOutputDevice"])
+            print(f"[DEBUG] default speakers info: {default_speakers}")
             if not default_speakers["isLoopbackDevice"]:
                 for loopback in p.get_loopback_device_info_generator():
                     if default_speakers["name"] in loopback["name"]:
@@ -49,11 +64,24 @@ class DefaultSpeakerRecorder(BaseRecorder):
                         break
                 else:
                     print("[ERROR] No loopback device found.")
-        
-        source = sr.Microphone(speaker=True,
-                               device_index= default_speakers["index"],
-                               sample_rate=int(default_speakers["defaultSampleRate"]),
-                               chunk_size=pyaudio.get_sample_size(pyaudio.paInt16),
-                               channels=default_speakers["maxInputChannels"])
+            p.terminate()
+            dev_index = default_speakers["index"]
+
+        elif os_name == 'Darwin':
+            for index, name in enumerate(sr.Microphone.list_microphone_names()):
+                # print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
+                if name == BLACKHOLE_MIC_NAME:
+                    dev_index = index
+
+            print("[DEBUG] \"{}\" microphone index is: {}".format(BLACKHOLE_MIC_NAME, dev_index))
+
+        # source = sr.Microphone(speaker=True,
+        #                        device_index=dev_index,
+        #                        sample_rate=int(default_speakers["defaultSampleRate"]),
+        #                        chunk_size=pyaudio.get_sample_size(pyaudio.paInt16),
+        #                        channels=default_speakers["maxOutputChannels"])
+        source = sr.Microphone(
+                               device_index=dev_index,
+                               chunk_size=pyaudio.get_sample_size(pyaudio.paInt16))
         super().__init__(source=source, source_name="Speaker")
-        self.adjust_for_noise("Default Speaker", "Please make or play some noise from the Default Speaker...")
+        self.adjust_for_noise("Please make or play some noise from the Default Speaker...")

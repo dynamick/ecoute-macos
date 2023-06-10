@@ -1,7 +1,11 @@
 
-# 🎧 Ecoute
+# 🎧 Ecoute macOS
 
 Ecoute is a live transcription tool that provides real-time transcripts for both the user's microphone input (You) and the user's speakers output (Speaker) in a textbox. It also generates a suggested response using OpenAI's GPT-3.5 for the user to say based on the live transcription of the conversation.
+
+**This fork supports macOS.** See config details [below](#macos)
+
+⚠️ **Warning** Windoz support regression testing has not been performed as of now (2023-06-10)
 
 ## 📖 Demo
 
@@ -15,10 +19,13 @@ Follow these steps to set up and run Ecoute on your local machine.
 
 ### 📋 Prerequisites
 
+#### Common
+
 - Python >=3.8.0
 - An OpenAI API key
-- Windows OS (Not tested on others)
-- FFmpeg 
+- FFmpeg
+
+#### Windows
 
 If FFmpeg is not installed in your system, you can follow the steps below to install it.
 
@@ -31,6 +38,24 @@ Once Chocolatey is installed, you can install FFmpeg by running the following co
 choco install ffmpeg-full
 ```
 Please ensure that you run these commands in a PowerShell window with administrator privileges. If you face any issues during the installation, you can visit the official Chocolatey and FFmpeg websites for troubleshooting.
+
+
+#### macOS
+
+**Dependencies and tools**
+
+- XCode Command Line Tools
+- `brew install portaudio python-tk ffmpeg blackhole-2ch`
+
+**BlackHole configuration**
+
+Setup "Multi-Ouput Device" and set it as default sound output device for your macOS. Guidelines are available [here](https://github.com/ExistentialAudio/BlackHole/wiki/Multi-Output-Device)
+
+**Configuring device names**
+
+Speakers audio on macOS will be recorded from the virtual "BlackHole 2ch" microphone. Your and BlackHole microphone device names could be adjusted via `HUMAN_MIC_NAME` and `BLACKHOLE_MIC_NAME` vars in the [AudioRecorder.py](./AudioRecorder.py).
+
+Run `python fetch_sr_data.py` to get speaker and microphone devices list and their indices.
 
 ### 🔧 Installation
 
@@ -51,7 +76,7 @@ Please ensure that you run these commands in a PowerShell window with administra
    ```
    pip install -r requirements.txt
    ```
-   
+
 4. Create a `keys.py` file in the ecoute directory and add your OpenAI API key:
 
    - Option 1: You can utilize a command on your command prompt. Run the following command, ensuring to replace "API KEY" with your actual OpenAI API key:
@@ -61,7 +86,7 @@ Please ensure that you run these commands in a PowerShell window with administra
       ```
 
    - Option 2: You can create the keys.py file manually. Open up your text editor of choice and enter the following content:
-   
+
       ```
       OPENAI_API_KEY="API KEY"
       ```
