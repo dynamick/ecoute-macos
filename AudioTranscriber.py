@@ -85,7 +85,8 @@ class AudioTranscriber:
 
     def process_speaker_data(self, data, temp_file_name):
         with wave.open(temp_file_name, 'wb') as wf:
-            # wf.setnchannels(self.audio_sources["Speaker"]["channels"])
+            # TODO: try to get from pyAudio automatically
+            wf.setnchannels(2)
             p = pyaudio.PyAudio()
             wf.setsampwidth(p.get_sample_size(pyaudio.paInt16))
             wf.setframerate(self.audio_sources["Speaker"]["sample_rate"])

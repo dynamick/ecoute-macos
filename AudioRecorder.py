@@ -40,8 +40,10 @@ class BaseRecorder:
 
 class DefaultMicRecorder(BaseRecorder):
     def __init__(self):
+        # TODO: change this to search via list_microphone_names() method
+        print("[INFO] Searching for working microphones...")
         working_mics = sr.Microphone.list_working_microphones()
-        print("[DEBUG] Available microphones: {}".format(working_mics))
+        print("[DEBUG] Available working microphones: {}".format(working_mics))
         device_index = list(working_mics.keys())[list(working_mics.values()).index(HUMAN_MIC_NAME)]
         super().__init__(source=sr.Microphone(device_index=device_index, sample_rate=16000), source_name="You")
         self.adjust_for_noise("Please make some noise from the " + HUMAN_MIC_NAME + " ...")

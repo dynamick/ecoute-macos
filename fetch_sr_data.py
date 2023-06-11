@@ -15,6 +15,9 @@ for index, name in enumerate(sr.Microphone.list_microphone_names()):
 
 print("\"{}\" microphone index is: {}".format(BLACKHOLE_MIC_NAME, blackhole_mic_index))
 
+working_mics = sr.Microphone.list_working_microphones()
+print("[DEBUG] Available working microphones: {}".format(working_mics))
+
 # r = sr.Recognizer()
 # with sr.Microphone(device_index=blackhole_mic_index) as source:
 #     print("Say something!")
