@@ -9,7 +9,10 @@ from datetime import datetime
 RECORD_TIMEOUT = 3
 ENERGY_THRESHOLD = 1000
 DYNAMIC_ENERGY_THRESHOLD = False
-HUMAN_MIC_NAME = "MacBook Pro Microphone"
+
+MBP_MIC_NAME = "MacBook Pro Microphone"
+PLANTRONICS_3220_MIC_NAME = "Plantronics Blackwire 3220 Series"
+HUMAN_MIC_NAME = PLANTRONICS_3220_MIC_NAME
 # macOS specific, see README.md#macos for the details on how to configure the BlackHole device
 BLACKHOLE_MIC_NAME = "BlackHole 2ch"
 
@@ -45,8 +48,11 @@ class DefaultMicRecorder(BaseRecorder):
 
         for index, name in enumerate(sr.Microphone.list_microphone_names()):
             # print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
+
+            # this assumes that mic has lower index number for combinded headsets (like Plantronics)
             if name == HUMAN_MIC_NAME:
                 device_index = index
+                break
 
             print("[DEBUG] \"{}\" microphone index is: {}".format(HUMAN_MIC_NAME, device_index))
 

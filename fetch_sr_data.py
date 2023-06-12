@@ -7,20 +7,23 @@ import speech_recognition as sr
 
 BLACKHOLE_MIC_NAME = "BlackHole 2ch"
 MBP_MIC_NAME = "MacBook Pro Microphone"
+PLANTRONICS_3220_MIC_NAME = "Plantronics Blackwire 3220 Series"
+
+dev_index = None
 
 ## list available microphones and obtain macOS "BlackHole 2ch" microphone index
 for index, name in enumerate(sr.Microphone.list_microphone_names()):
     print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
-    if name == BLACKHOLE_MIC_NAME:
-        blackhole_mic_index = index
+    if name == PLANTRONICS_3220_MIC_NAME and dev_index is None:
+        dev_index = index
 
-print("\"{}\" microphone index is: {}".format(BLACKHOLE_MIC_NAME, blackhole_mic_index))
+print("\"{}\" microphone index is: {}".format(PLANTRONICS_3220_MIC_NAME, dev_index))
 
 working_mics = sr.Microphone.list_working_microphones()
 print("Available working microphones: {}".format(working_mics))
 
 # r = sr.Recognizer()
-# with sr.Microphone(device_index=blackhole_mic_index) as source:
+# with sr.Microphone(device_index=dev_index) as source:
 #     print("Say something!")
 #     audio = r.listen(source)
 
