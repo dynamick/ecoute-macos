@@ -93,6 +93,7 @@ class DefaultSpeakerRecorder(BaseRecorder):
         #                        sample_rate=int(default_speakers["defaultSampleRate"]),
         #                        chunk_size=pyaudio.get_sample_size(pyaudio.paInt16),
         #                        channels=default_speakers["maxOutputChannels"])
+        # TODO: experiment with Microphone params
         source = sr.Microphone(
                                device_index=device_index,
                                chunk_size=pyaudio.get_sample_size(pyaudio.paInt16))
