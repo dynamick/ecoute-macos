@@ -9,7 +9,7 @@ from datetime import datetime
 RECORD_TIMEOUT = 3
 ENERGY_THRESHOLD = 1000
 DYNAMIC_ENERGY_THRESHOLD = False
-HUMAN_MIC_NAME = "Plantronics Blackwire 3220 Series"
+HUMAN_MIC_NAME = "MacBook Pro Microphone"
 # macOS specific, see README.md#macos for the details on how to configure the BlackHole device
 BLACKHOLE_MIC_NAME = "BlackHole 2ch"
 
@@ -40,11 +40,16 @@ class BaseRecorder:
 
 class DefaultMicRecorder(BaseRecorder):
     def __init__(self):
-        # TODO: change this to search via list_microphone_names() method
-        print("[INFO] Searching for working microphones...")
-        working_mics = sr.Microphone.list_working_microphones()
-        print("[DEBUG] Available working microphones: {}".format(working_mics))
-        device_index = list(working_mics.keys())[list(working_mics.values()).index(HUMAN_MIC_NAME)]
+
+        device_index = None
+
+        for index, name in enumerate(sr.Microphone.list_microphone_names()):
+            # print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
+            if name == HUMAN_MIC_NAME:
+                device_index = index
+
+            print("[DEBUG] \"{}\" microphone index is: {}".format(HUMAN_MIC_NAME, device_index))
+
         super().__init__(source=sr.Microphone(device_index=device_index, sample_rate=16000), source_name="You")
         self.adjust_for_noise("Please make some noise from the " + HUMAN_MIC_NAME + " ...")
 
@@ -52,7 +57,7 @@ class DefaultSpeakerRecorder(BaseRecorder):
     def __init__(self):
 
         os_name = platform.system()
-        dev_index = None
+        device_index = None
 
         if os_name == 'Windows':
             p = pyaudio.PyAudio()
@@ -67,23 +72,23 @@ class DefaultSpeakerRecorder(BaseRecorder):
                 else:
                     print("[ERROR] No loopback device found.")
             p.terminate()
-            dev_index = default_speakers["index"]
+            device_index = default_speakers["index"]
 
         elif os_name == 'Darwin':
             for index, name in enumerate(sr.Microphone.list_microphone_names()):
                 # print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
                 if name == BLACKHOLE_MIC_NAME:
-                    dev_index = index
+                    device_index = index
 
-            print("[DEBUG] \"{}\" microphone index is: {}".format(BLACKHOLE_MIC_NAME, dev_index))
+            print("[DEBUG] \"{}\" microphone index is: {}".format(BLACKHOLE_MIC_NAME, device_index))
 
         # source = sr.Microphone(speaker=True,
-        #                        device_index=dev_index,
+        #                        device_index=device_index,
         #                        sample_rate=int(default_speakers["defaultSampleRate"]),
         #                        chunk_size=pyaudio.get_sample_size(pyaudio.paInt16),
         #                        channels=default_speakers["maxOutputChannels"])
         source = sr.Microphone(
-                               device_index=dev_index,
+                               device_index=device_index,
                                chunk_size=pyaudio.get_sample_size(pyaudio.paInt16))
         super().__init__(source=source, source_name="Speaker")
         self.adjust_for_noise("Please make or play some noise from the Default Speaker...")
