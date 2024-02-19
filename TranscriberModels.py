@@ -1,9 +1,10 @@
 from openai import OpenAI
-
-client = OpenAI()
+from keys import OPENAI_API_KEY
 import whisper
 import os
 import torch
+
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 def get_model(use_api):
     if use_api:
@@ -23,12 +24,15 @@ class WhisperTranscriber:
             print(e)
             return ''
         return result.text.strip()
-    
+
 class APIWhisperTranscriber:
     def get_transcription(self, wav_file_path):
         try:
             with open(wav_file_path, "rb") as audio_file:
-                result = client.audio.transcribe("whisper-1", audio_file)
+                result = client.audio.transcriptions.create(
+                    model="whisper-1",
+                    file=audio_file,
+                )
         except Exception as e:
             print(e)
             return ''

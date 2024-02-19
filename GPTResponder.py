@@ -1,10 +1,9 @@
 from openai import OpenAI
-
-client = OpenAI(api_key=OPENAI_API_KEY)
 from keys import OPENAI_API_KEY
 from prompts import create_prompt, INITIAL_RESPONSE
 import time
 
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 def generate_response_from_transcript(transcript):
     try:
@@ -19,7 +18,7 @@ def generate_response_from_transcript(transcript):
         return full_response.split('[')[1].split(']')[0]
     except:
         return ''
-    
+
 class GPTResponder:
     def __init__(self):
         self.response = INITIAL_RESPONSE
@@ -30,13 +29,13 @@ class GPTResponder:
             if transcriber.transcript_changed_event.is_set():
                 start_time = time.time()
 
-                transcriber.transcript_changed_event.clear() 
+                transcriber.transcript_changed_event.clear()
                 transcript_string = transcriber.get_transcript()
                 response = generate_response_from_transcript(transcript_string)
-                
+
                 end_time = time.time()  # Measure end time
                 execution_time = end_time - start_time  # Calculate the time it took to execute the function
-                
+
                 if response != '':
                     self.response = response
 
