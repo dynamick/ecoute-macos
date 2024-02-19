@@ -1,4 +1,6 @@
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 import whisper
 import os
 import torch
@@ -20,14 +22,14 @@ class WhisperTranscriber:
         except Exception as e:
             print(e)
             return ''
-        return result['text'].strip()
+        return result.text.strip()
     
 class APIWhisperTranscriber:
     def get_transcription(self, wav_file_path):
         try:
             with open(wav_file_path, "rb") as audio_file:
-                result = openai.Audio.transcribe("whisper-1", audio_file)
+                result = client.audio.transcribe("whisper-1", audio_file)
         except Exception as e:
             print(e)
             return ''
-        return result['text'].strip()
+        return result.text.strip()
