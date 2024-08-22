@@ -8,3 +8,5 @@ PyAudio==0.2.14
 --extra-index-url https://download.pytorch.org/whl/cu117
 torch
 SpeechRecognition==3.10.1
+tkhtmlview
+markdown2

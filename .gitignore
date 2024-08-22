@@ -2,4 +2,6 @@ __pycache__/
 *.wav
 keys.py
 .venv/
+venv/
+.idea
 .DS_Store

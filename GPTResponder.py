@@ -1,14 +1,15 @@
 from openai import OpenAI
 from keys import OPENAI_API_KEY
-from prompts import create_prompt, INITIAL_RESPONSE
+from prompts import  create_prompt, INITIAL_RESPONSE
 import time
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 def generate_response_from_transcript(transcript):
     try:
-        response = client.chat.completions.create(model="gpt-3.5-turbo-0301",
-        messages=[{"role": "system", "content": create_prompt(transcript)}],
+        response = client.chat.completions.create(model="gpt-4o-mini",
+        messages=[{"role": "system", "content": create_prompt(transcript)},
+                  {"role": "user", "content": transcript}],
         temperature = 0.0)
     except Exception as e:
         print(e)

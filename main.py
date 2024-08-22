@@ -2,30 +2,60 @@ import threading
 from AudioTranscriber import AudioTranscriber
 from GPTResponder import GPTResponder
 import customtkinter as ctk
-import AudioRecorder 
+import AudioRecorder
 import queue
 import time
 import torch
 import sys
 import TranscriberModels
 import subprocess
+import tkinter as tk
+from tkhtmlview import HTMLScrolledText
+import markdown2
 
-def write_in_textbox(textbox, text):
-    textbox.delete("0.0", "end")
-    textbox.insert("0.0", text)
 
 def update_transcript_UI(transcriber, textbox):
     transcript_string = transcriber.get_transcript()
     write_in_textbox(textbox, transcript_string)
     textbox.after(300, update_transcript_UI, transcriber, textbox)
 
+
+
+def write_in_textbox(textbox, text):
+
+    # If code block trailing delimiter is missing, add it
+    if text.count("```") % 2 != 0:
+        text += "```"
+    # Convert Markdown to HTML, including code blocks delimited by ```
+    html_content = markdown2.markdown(
+        text,
+        extras=["fenced-code-blocks"]
+    )
+
+    # Apply inline styles directly to the HTML content
+    styled_html = f"""
+    <div style="font-size: 18px; line-height: 1.6; font-family: Arial, sans-serif; color: #333;">
+        {html_content}
+    </div>
+    """
+
+    # Replace <pre> and <code> tags with inline styled versions
+    styled_html = styled_html.replace(
+        "<pre>",
+        """<pre style="background-color: #f5f5f5; border: 1px solid #ccc; border-radius: 4px; padding: 16px; overflow-x: auto; ">"""
+    )
+    styled_html = styled_html.replace(
+        "<code>",
+        """<code style="font-family: monospace; font-size: 18px; color: #0066ff;">"""
+    )
+
+    # Update the HTMLLabel widget content with the styled HTML
+    textbox.set_html(styled_html)
+
 def update_response_UI(responder, textbox, update_interval_slider_label, update_interval_slider, freeze_state):
     if not freeze_state[0]:
         response = responder.response
-
-        textbox.configure(state="normal")
         write_in_textbox(textbox, response)
-        textbox.configure(state="disabled")
 
         update_interval = int(update_interval_slider.get())
         responder.update_response_interval(update_interval)
@@ -47,11 +77,12 @@ def create_ui_components(root):
 
     font_size = 20
 
-    transcript_textbox = ctk.CTkTextbox(root, width=300, font=("Arial", font_size), text_color='#FFFCF2', wrap="word")
+    transcript_textbox = HTMLScrolledText(root, html="<h2>Initial Content</h2>")
     transcript_textbox.grid(row=0, column=0, padx=10, pady=20, sticky="nsew")
 
-    response_textbox = ctk.CTkTextbox(root, width=300, font=("Arial", font_size), text_color='#639cdc', wrap="word")
+    response_textbox = HTMLScrolledText(root,  html="<h2>Initial Content</h2>")
     response_textbox.grid(row=0, column=1, padx=10, pady=20, sticky="nsew")
+
 
     freeze_button = ctk.CTkButton(root, text="Freeze", command=None)
     freeze_button.grid(row=1, column=1, padx=10, pady=3, sticky="nsew")
@@ -121,7 +152,7 @@ def main():
 
     update_transcript_UI(transcriber, transcript_textbox)
     update_response_UI(responder, response_textbox, update_interval_slider_label, update_interval_slider, freeze_state)
- 
+
     root.mainloop()
 
 if __name__ == "__main__":

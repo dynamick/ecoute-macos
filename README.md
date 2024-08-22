@@ -1,7 +1,14 @@
-
 # 🎧 Ecoute macOS
 
 Ecoute is a live transcription tool that provides real-time transcripts for both the user's microphone input (You) and the user's speakers output (Speaker) in a textbox. It also generates a suggested response using OpenAI's GPT-3.5 for the user to say based on the live transcription of the conversation.
+
+# Changes from the original branch
+
+This fork add some nice features
+
+- added a **markdown** interpreter so headers, lists, code fragments are now showed in a pretty way
+- added the new chatGPT engine: **gpt-4o-mini**
+- added `init` (launch it just once, it creates the environment and download all packages) and `start` (launch it every time you want to use it) scripts
 
 **This fork supports macOS.** See config details [below](#macos)
 
@@ -30,13 +37,17 @@ Follow these steps to set up and run Ecoute on your local machine.
 If FFmpeg is not installed in your system, you can follow the steps below to install it.
 
 First, you need to install Chocolatey, a package manager for Windows. Open your PowerShell as Administrator and run the following command:
+
 ```
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 ```
+
 Once Chocolatey is installed, you can install FFmpeg by running the following command in your PowerShell:
+
 ```
 choco install ffmpeg
 ```
+
 Please ensure that you run these commands in a PowerShell window with administrator privileges. If you face any issues during the installation, you can visit the official Chocolatey and FFmpeg websites for troubleshooting.
 
 #### macOS
@@ -76,20 +87,23 @@ Run `python fetch_sr_data.py` to get speaker and microphone devices list and the
    pip install -r requirements.txt
    ```
 
+   or launch the `./init` script (**new feature**)
+
 4. Create a `keys.py` file in the ecoute directory and add your OpenAI API key:
 
    - Option 1: You can utilize a command on your command prompt. Run the following command, ensuring to replace "API KEY" with your actual OpenAI API key:
 
-      ```
-      python -c "with open('keys.py', 'w', encoding='utf-8') as f: f.write('OPENAI_API_KEY=\"API KEY\"')"
-      ```
+     ```
+     python -c "with open('keys.py', 'w', encoding='utf-8') as f: f.write('OPENAI_API_KEY=\"API KEY\"')"
+     ```
 
    - Option 2: You can create the keys.py file manually. Open up your text editor of choice and enter the following content:
 
-      ```
-      OPENAI_API_KEY="API KEY"
-      ```
-      Replace "API KEY" with your actual OpenAI API key. Save this file as keys.py within the ecoute directory.
+     ```
+     OPENAI_API_KEY="API KEY"
+     ```
+
+     Replace "API KEY" with your actual OpenAI API key. Save this file as keys.py within the ecoute directory.
 
 ### 🎬 Running Ecoute
 
@@ -104,6 +118,8 @@ For a more better and faster version that also works with most languages, use:
 ```
 python main.py --api
 ```
+
+or launch the `./start` script (**new feature**)
 
 Upon initiation, Ecoute will begin transcribing your microphone input and speaker output in real-time, generating a suggested response based on the conversation. Please note that it might take a few seconds for the system to warm up before the transcription becomes real-time.
 
